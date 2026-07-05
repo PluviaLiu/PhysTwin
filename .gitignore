@@ -1,5 +1,13 @@
+# ===== Local git-management additions (large data & legacy git dir) =====
+# Old .git directory from the original clone, renamed and kept locally.
+.git_disabled/
+# Large data / experiment archives (exceed GitHub 100MB limit, not for VCS).
+*.zip
+# ========================================================================
+
 test.py
 wandb/
+
 experiments/
 past_exps/
 *.npy
