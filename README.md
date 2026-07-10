@@ -1,5 +1,8 @@
-# PhysTwin: Physics-Informed Reconstruction and Simulation of Deformable Objects from Videos
+<h1 align="center">PhysTwin</h1>
 
+<p align="center"><strong>Physics-Informed Reconstruction and Simulation of Deformable Objects from Videos</strong></p>
+
+<p align="center">
 <span class="author-block">
 <a target="_blank" href="https://jianghanxiao.github.io/">Hanxiao Jiang</a><sup>1,2</sup>,
 </span>
@@ -21,25 +24,72 @@
 
 <span class="author-block"><sup>1</sup>Columbia University,</span>
 <span class="author-block"><sup>2</sup>University of Illinois Urbana-Champaign</span>
+</p>
 
-### [Website](https://jianghanxiao.github.io/phystwin-web/) | [Paper](https://jianghanxiao.github.io/phystwin-web/phystwin.pdf) | [Arxiv](https://arxiv.org/abs/2503.17973)
+<p align="center">
+  <a href="https://jianghanxiao.github.io/phystwin-web/"><img src="https://img.shields.io/badge/Project-Website-1f6feb?style=for-the-badge" alt="Project website"></a>
+  <a href="https://jianghanxiao.github.io/phystwin-web/phystwin.pdf"><img src="https://img.shields.io/badge/Paper-PDF-b31b1b?style=for-the-badge" alt="Paper PDF"></a>
+  <a href="https://arxiv.org/abs/2503.17973"><img src="https://img.shields.io/badge/arXiv-2503.17973-b31b1b?style=for-the-badge" alt="arXiv"></a>
+</p>
 
-### Overview
-This repository contains the official implementation of the **PhysTwin** framework.
+<p align="center">
+  <img src="https://img.shields.io/badge/Physics--informed-Reconstruction-0f766e?style=flat-square" alt="Physics-informed reconstruction">
+  <img src="https://img.shields.io/badge/Interactive-Playable%20simulation-7c3aed?style=flat-square" alt="Interactive simulation">
+  <img src="https://img.shields.io/badge/ICCV-2025-f59e0b?style=flat-square" alt="ICCV 2025">
+</p>
 
-![TEASER](./assets/teaser.png)
+<p align="center">
+  <code>Video observations</code> &nbsp;→&nbsp; <code>Physics-informed twin</code> &nbsp;→&nbsp; <code>Interactive simulation</code>
+</p>
+
+## Why PhysTwin
+
+> [!TIP]
+> **PhysTwin** is the official framework for physics-informed reconstruction and simulation of deformable objects from videos.
+
+<table>
+  <tr>
+    <td width="33%" align="center" valign="top">
+      <h3>🎥 Reconstruct</h3>
+      <sub>Process raw RGB-D observations into a physics-informed, deformable-object twin.</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
+      <h3>🕹️ Interact</h3>
+      <sub>Explore constructed PhysTwins through an interactive playground and remote control.</sub>
+    </td>
+    <td width="33%" align="center" valign="top">
+      <h3>🔬 Analyze</h3>
+      <sub>Inspect force, material, rendering quality, and multi-object interactions.</sub>
+    </td>
+  </tr>
+</table>
+
+<p align="center">
+  <img src="./assets/teaser.png" alt="PhysTwin teaser" width="100%">
+</p>
+
+<p align="center">
+  <a href="#why-phystwin">Why PhysTwin</a> &nbsp;·&nbsp; <a href="#updates--roadmap">News</a> &nbsp;·&nbsp; <a href="#setup">Setup</a> &nbsp;·&nbsp; <a href="#data--pretrained-results">Data</a> &nbsp;·&nbsp; <a href="#interactive-playground">Playground</a> &nbsp;·&nbsp; <a href="#workflows">Workflows</a> &nbsp;·&nbsp; <a href="#citation">Citation</a>
+</p>
 
 
-### Update
+## Updates & Roadmap
 **This repository will be actively maintained by the authors, with continuous updates introducing new features to inspire further research.**
 
 - **Actively Developing:** In the long term, we aim to develop a comprehensive physics simulator focused on real-to-sim, serving as an easy-to-use platform for XR, VR, and robotics applications. **Feel free to reach out via email if you’re also interested in this direction and would like to collaborate on related research projects.**
 
-- **To Release:** In our latest project, we will release a batched version of the system, achieving over 300× speedup for accelerated computation and an average 6K FPS throughput (with a maximum of 30K FPS in some cases) in the batch simulation setting. This version also supports low-power execution on edge devices, achieving real-time performance on Jetson-like XR platforms. (A game demo in which an RL policy for rope manipulation is trained in just 3 minutes using the batched simulator.)
+- **Separate upcoming project — Boba:** In our latest project, we will release a batched version of the system, achieving over 300× speedup for accelerated computation and an average 6K FPS throughput (with a maximum of 30K FPS in some cases) in the batch simulation setting. This version also supports low-power execution on edge devices, achieving real-time performance on Jetson-like XR platforms. (A game demo in which an RL policy for rope manipulation is trained in just 3 minutes using the batched simulator.)
 
 <p align="center">
   <img src="./assets/RL_game.gif" width="50%">
 </p>
+
+- **[26.7.10] More PhysTwin-like data with [Deform360](https://deform360.lhy.xyz/).** Our new project, **Deform360: A Massive Multi-view Visuotactile Dataset for Deformable World Models**, is now accepted to ECCV 2026. It provides large-scale real-world data for deformable dynamics: **198** daily-life objects, **1,980** interaction sequences, and **215+ hours** of observations from **41** surround-view cameras and bimanual tactile grippers.
+  <p align="center">
+    <a href="https://deform360.lhy.xyz/">
+      <img src="https://jianghanxiao.github.io/files/deform360.gif" alt="Deform360: multi-view visuotactile deformable-object interactions" width="78%">
+    </a>
+  </p>
 
 - **[26.3.16] MPPI Planning with PhysTwin::** We provide an example codebase in [PhysTwin-MPC](https://github.com/Jianghanxiao/PhysTwin-MPC) demonstrating how to leverage PhysTwin for MPPI-based robot planning. The repository is intended as a reference implementation; users should adapt it to their specific hardware setups, camera configurations, and application requirements.
 
@@ -49,14 +99,16 @@ This repository contains the official implementation of the **PhysTwin** framewo
 
 - **[25.10.26] Speed Acceleration for Self-Collision Cases:** For scenarios involving self-collision, instead of checking all particle pairs within a distance threshold, we introduce a mechanism to ignore topologically adjacent particle pairs. This significantly accelerates both optimization and inference in cloth-like cases where self-collision is activated. The main modification is implemented in [code](https://github.com/Jianghanxiao/PhysTwin/blob/release_collision_accelerate/qqtt/engine/trainer_warp.py#L179),and the feature is available in the branch `release_collision_accelerate`. This is a pre-released feature developed as part of an ongoing project. The fully accelerated system will be released once the complete system is done.
 
-![accelerated_example](./assets/cloth_collision_accelerate.gif)
+<p align="center">
+  <img src="./assets/cloth_collision_accelerate.gif" alt="Accelerated cloth self-collision example" width="70%">
+</p>
 
 - **[25.7.22] Remote Control Feature & Bug Fix:** Fixed a deprojection error in the data processing pipeline. Added support for remote control—previously, the interactive playground only responded to physical keyboard input; it now accepts virtual keyboard signals from remote devices as well.
 
 - **[25.4.15] GPU Memory Optimization:** Thanks to user feedback and testing, we've further optimized the code to reduce GPU memory usage in the interactive playground—now requiring only about 2GB in total. Previously, LBS initialization consumed a significant amount of GPU memory; it's now offloaded to the CPU and only needs to run once at startup. Everything runs smoothly as a result.
 
 - **[25.4.8] Optmization Speed:** Regarding the questions on optimization speed, thanks to Nvidia Warp, our differentiable Spring-Mass simulator enables first-order optimization in approximately 5 minutes—and even faster with visualizations disabled—significantly outperforming prior work that typically requires hours. The zero-order, sampling-based optimization (CMA-ES) takes around 12 minutes, depending on the number of epochs. These statistics are based on the stuffed animal experiments without self-collision enabled.
-  
+
 - **[25.4.4] Material Visualization:** Show the experimental features to visualize the materials approximated from the underlying spring-mass model. (See below for detailed instructions)
 <p align="center">
   <img src="./assets/material_rope.gif" width="30%">
@@ -80,12 +132,14 @@ This repository contains the official implementation of the **PhysTwin** framewo
   <img src="./assets/force_sloth.gif" width="30%">
 </p>
 
-#### Long-Term Plans
+### Long-Term Plans
 In the long term, we aim to develop a comprehensive physics simulator focused on real-to-sim, serving as an easy-to-use platform for XR, VR, and robotics applications. **Feel free to reach out via email if you’re also interested in this direction and would like to collaborate on related research projects.**
 
 
-### Setup
-#### 🐧Linux Setup
+## Setup
+
+> **Choose one installation path below** — standard Linux, Windows, Docker, or the RTX 5090-specific environment.
+### 🐧 Linux Setup
 ```
 # Here we use cuda-12.1
 export PATH={YOUR_DIR}/cuda/cuda-12.1/bin:$PATH
@@ -102,10 +156,10 @@ bash ./env_install/env_install.sh
 bash ./env_install/download_pretrained_models.sh
 ```
 
-#### 🪟Windows Setup
+### 🪟 Windows Setup
 Thanks to @GuangyanCai contributions, now we also have a windows setup codebase in `windows_setup` branch.
 
-#### 🐳Docker Setup
+### 🐳 Docker Setup
 Thanks to @epiception contributions, we now have Docker support as well.
 ```
 export DOCKER_USERNAME="your_alias" # default is ${whoami} (optional)
@@ -116,7 +170,7 @@ chmod +x ./docker_scripts/build.sh
 ./docker_scripts/build.sh 8.9+PTX # For NVIDIA RTX 40 series GPUs
 ```
 
-#### 🐧Linux Setup (RTX 5090 + CUDA 12.8 + Python 3.10 Specific)
+### 🐧 Linux Setup — RTX 5090 + CUDA 12.8 + Python 3.10
 ```
 # Here we use CUDA 12.8
 export PATH={YOUR_DIR}/cuda/bin:$PATH
@@ -137,7 +191,10 @@ bash ./env_install/5090_env_install.sh
 bash ./env_install/download_pretrained_models.sh
 ```
 
-### Download the PhysTwin Data
+## Data & Pretrained Results
+
+> [!IMPORTANT]
+> Download the archives into the project root before using the included examples.
 Download the original data, processed data, and results into the project's root folder. (The following sections will explain how to process the raw observations and obtain the training results.)
 - [data](https://huggingface.co/datasets/Jianghanxiao/PhysTwin/resolve/main/data.zip): this includes the original data for different cases and the processed data for quick run. The different case_name can be found under `different_types` folder.
 - [experiments_optimization](https://huggingface.co/datasets/Jianghanxiao/PhysTwin/resolve/main/experiments_optimization.zip): results of our first-stage zero-order optimization.
@@ -145,10 +202,14 @@ Download the original data, processed data, and results into the project's root 
 - [gaussian_output](https://huggingface.co/datasets/Jianghanxiao/PhysTwin/resolve/main/gaussian_output.zip): results of our static gaussian appearance.
 - [(optional) additional_data](https://huggingface.co/datasets/Jianghanxiao/PhysTwin/resolve/main/additional_data.zip): data for extra clothing demos not included in the original paper.
 
-### Play with the Interactive Playground
+## Interactive Playground
+
+> **Start here.** Load an existing PhysTwin and manipulate it with the keyboard.
 Use the previously constructed PhysTwin to explore the interactive playground. Users can interact with the pre-built PhysTwin using keyboard. The next section will provide a detailed guide on how to construct the PhysTwin from the original data.
 
-![example](./assets/sloth.gif)
+<p align="center">
+  <img src="./assets/sloth.gif" alt="Interactive PhysTwin playground" width="70%">
+</p>
 
 Run the interactive playground with our different cases (Need to wait some time for the first usage of interactive playground; Can achieve about 37 FPS using RTX 4090 on sloth case)
 
@@ -173,12 +234,14 @@ conda activate phystwin_env
 python interactive_playground.py --inv_ctrl --n_ctrl_parts 2 --case_name double_lift_cloth_3
 ```
 
-Options: 
+Options:
 -   --inv_ctrl: inverse the control direction
--   --n_ctrol_parts: number of control panel (single: 1, double: 2) 
+-   --n_ctrol_parts: number of control panel (single: 1, double: 2)
 -   --case_name: case name of the PhysTwin case
 
-### Train the PhysTwin with the data
+## Workflows
+
+### Train a PhysTwin from data
 Use the processed data to train the PhysTwin. Instructions on how to get above `experiments_optimization`, `experiments` and `gaussian_output` (Can adjust the code below to only train on several cases). After this step, you get the PhysTwin that can be used in the interactive playground.
 ```
 # Zero-order Optimization
@@ -194,7 +257,7 @@ python script_inference.py
 bash gs_run.sh
 ```
 
-### Evaluate the performance of the contructed PhysTwin
+### Evaluate a constructed PhysTwin
 To evaluate the performance of the constructed PhysTwin, need to render the images in the original viewpoint (similar logic to interactive playground)
 ```
 # Use LBS to render the dynamic videos (The final videos in ./gaussian_output_dynamic folder)
@@ -208,7 +271,7 @@ bash gs_run_simulate_white.sh
 python visualize_render_results.py
 ```
 
-### Data Processing from Raw Videos
+### Process raw videos
 The original data in each case only includes `color`, `depth`, `calibrate.pkl`, `metadata.json`. All other data are processed as below to get, including the projection, tracking and shape priors.
 (Note: Be aware of the conflict in the diff-gaussian-rasterization library between Gaussian Splatting and Trellis. For data processing, you don't need to install the gaussian splatting; ignore the last section in env_install.sh)
 ```
@@ -222,6 +285,8 @@ python export_gaussian_data.py
 python export_video_human_mask.py
 ```
 
+## Visualization & Experimental Features
+
 ### Control Force Visualization
 Visualize the force applied by the hand to the object as inferred from our PhysTwin model, based solely on video data.
 ```
@@ -230,9 +295,9 @@ python visualize_force.py \
 --case_name [case_name]
 
 # Examples of usage:
-python visualize_force.py --case_name single_push_rope_1 --n_ctrl_parts 1 
-python visualize_force.py --case_name single_clift_cloth_1 --n_ctrl_parts 1    
-python visualize_force.py --case_name double_stretch_sloth 
+python visualize_force.py --case_name single_push_rope_1 --n_ctrl_parts 1
+python visualize_force.py --case_name single_clift_cloth_1 --n_ctrl_parts 1
+python visualize_force.py --case_name double_stretch_sloth
 ```
 The visualziation video is saved under `experiments` folder.
 
@@ -265,7 +330,9 @@ python interactive_playground.py --n_ctrl_parts 2 --case_name double_stretch_slo
 ### Web-based Visualization for headless-server
 This feature is contributed by @CAN-Lee—many thanks to the community for the effort (Pull Request #43).
 
-![Gradio_support](./assets/gradio_support.png)
+<p align="center">
+  <img src="./assets/gradio_support.png" alt="Gradio-based headless server visualization" width="80%">
+</p>
 
 Try the experimental features for setting up an interactive playground on a server and accessing it through a web browser.
 
@@ -282,8 +349,8 @@ python interactive_playground_gradio.py \
      --share
 ```
 
-### Follow-up and Potential Collaborations  
-If you are interested in collaborating or extending this work for your research, feel free to contact us at `hanxiao.jiang@columbia.edu`.  
+## Collaborate with us
+If you are interested in collaborating or extending this work for your research, feel free to contact us at `hanxiao.jiang@columbia.edu`.
 
 ## Projects Developed or Benchmarked with PhysTwin
 * **[NovaFlow: Zero-Shot Manipulation via Actionable Flow from Generated Videos](https://novaflow.lhy.xyz/)**
@@ -292,9 +359,11 @@ If you are interested in collaborating or extending this work for your research,
 * **[NeuSpring: Neural Spring Fields for Reconstruction and Simulation of Deformable Objects from Videos](https://arxiv.org/abs/2511.08310)**
 * **[Cool PhysTwin Data Collection Pipeline using SO-101](https://github.com/TabithaKO/PhysTwin)**
 * **[DeformMaster: An Interactive Physics-Neural World Model for Deformable Objects from Videos](https://arxiv.org/abs/2605.09586)**
+* **[PhysHanDI: Physics-Based Reconstruction of Hand-Deformable Object Interactions](https://jyunlee.github.io/projects/physhandi/)**
+* **[PhySPRING: Structure-Preserving Reduction of Physics-Informed Twins via GNN](https://arxiv.org/pdf/2605.07687v1)**
 * ...
 
-### Citation
+## Citation
 If you find this repo useful for your research, please consider citing the paper
 ```
 @article{jiang2025phystwin,
