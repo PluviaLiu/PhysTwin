@@ -20,7 +20,7 @@
 </span>
 <span class="author-block">
 <a target="_blank" href="https://yunzhuli.github.io/">Yunzhu Li</a><sup>1</sup>
-</span>
+</span><br>
 
 <span class="author-block"><sup>1</sup>Columbia University,</span>
 <span class="author-block"><sup>2</sup>University of Illinois Urbana-Champaign</span>
@@ -87,7 +87,7 @@
 - **[26.7.10] More PhysTwin-like data with [Deform360](https://deform360.lhy.xyz/).** Our new project, **Deform360: A Massive Multi-view Visuotactile Dataset for Deformable World Models**, is now accepted to ECCV 2026. It provides large-scale real-world data for deformable dynamics: **198** daily-life objects, **1,980** interaction sequences, and **215+ hours** of observations from **41** surround-view cameras and bimanual tactile grippers.
   <p align="center">
     <a href="https://deform360.lhy.xyz/">
-      <img src="https://jianghanxiao.github.io/files/deform360.gif" alt="Deform360: multi-view visuotactile deformable-object interactions" width="78%">
+      <img src="./assets/deform360.gif" alt="Deform360: multi-view visuotactile deformable-object interactions" width="78%">
     </a>
   </p>
 
