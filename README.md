@@ -20,11 +20,13 @@
 </span>
 <span class="author-block">
 <a target="_blank" href="https://yunzhuli.github.io/">Yunzhu Li</a><sup>1</sup>
-</span><br>
-
-<span class="author-block"><sup>1</sup>Columbia University,</span>
-<span class="author-block"><sup>2</sup>University of Illinois Urbana-Champaign</span>
+</span>
 </p>
+
+<div align="center">
+  <sup>1</sup>Columbia University,
+  <sup>2</sup>University of Illinois Urbana-Champaign
+</div>
 
 <p align="center">
   <a href="https://jianghanxiao.github.io/phystwin-web/"><img src="https://img.shields.io/badge/Project-Website-1f6feb?style=for-the-badge" alt="Project website"></a>
