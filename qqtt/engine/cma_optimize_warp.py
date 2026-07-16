@@ -9,6 +9,17 @@ import warp as wp
 import cma
 import pickle
 import os
+import time
+
+
+def _sync_cuda():
+    if torch.cuda.is_available():
+        torch.cuda.synchronize()
+
+
+def _elapsed(start_time):
+    _sync_cuda()
+    return time.perf_counter() - start_time
 
 
 class OptimizerCMA:
@@ -33,6 +44,7 @@ class OptimizerCMA:
 
         self.init_masks = None
         self.init_velocities = None
+        self._timer_eval_id = 0
         # Load the data
         if cfg.data_type == "real":
             self.dataset = RealData(visualize=False)
@@ -201,7 +213,10 @@ class OptimizerCMA:
         return value * (max - min) + min
 
     def optimize(self, max_iter=100):
+        optimize_total_t0 = time.perf_counter()
+
         # Initialize the parameters
+        init_param_t0 = time.perf_counter()
         init_global_spring_Y = self.normalize(
             cfg.init_spring_Y, cfg.spring_Y_min, cfg.spring_Y_max
         )
@@ -233,14 +248,31 @@ class OptimizerCMA:
             init_drag_damping,
             init_dashpot_damping,
         ]
+        logger.info(
+            f"[TIMER][CMA][{cfg.run_name}] 初始化参数: {_elapsed(init_param_t0):.3f}s"
+        )
 
+        init_eval_t0 = time.perf_counter()
         self.error_func(
             x_init, visualize=True, video_path=f"{cfg.base_dir}/optimizeCMA/init.mp4"
         )
+        logger.info(
+            f"[TIMER][CMA][{cfg.run_name}] 初始 visualize eval: {_elapsed(init_eval_t0):.3f}s"
+        )
 
+        cma_setup_t0 = time.perf_counter()
         std = 1 / 6
         es = cma.CMAEvolutionStrategy(x_init, std, {"bounds": [0.0, 1.0], "seed": 42})
+        logger.info(
+            f"[TIMER][CMA][{cfg.run_name}] 创建 CMAEvolutionStrategy: {_elapsed(cma_setup_t0):.3f}s"
+        )
+
+        cma_opt_t0 = time.perf_counter()
         es.optimize(self.error_func, iterations=max_iter)
+        logger.info(
+            f"[TIMER][CMA][{cfg.run_name}] CMA optimize: {_elapsed(cma_opt_t0):.3f}s, "
+            f"iterations={max_iter}"
+        )
 
         # Get the results
         res = es.result
@@ -263,10 +295,14 @@ class OptimizerCMA:
         final_drag_damping = self.denormalize(optimal_x[10], 0, 20)
         final_dashpot_damping = self.denormalize(optimal_x[11], 0, 200)
 
+        final_eval_t0 = time.perf_counter()
         self.error_func(
             optimal_x,
             visualize=True,
             video_path=f"{cfg.base_dir}/optimizeCMA/optimal.mp4",
+        )
+        logger.info(
+            f"[TIMER][CMA][{cfg.run_name}] optimal visualize eval: {_elapsed(final_eval_t0):.3f}s"
         )
 
         optimal_results = {}
@@ -284,10 +320,24 @@ class OptimizerCMA:
         optimal_results["dashpot_damping"] = final_dashpot_damping
 
         # Save out all the initialized parameters
+        save_t0 = time.perf_counter()
         with open(f"{cfg.base_dir}/optimal_params.pkl", "wb") as f:
             pickle.dump(optimal_results, f)
+        logger.info(
+            f"[TIMER][CMA][{cfg.run_name}] 保存 optimal_params.pkl: {_elapsed(save_t0):.3f}s"
+        )
+        logger.info(
+            f"[TIMER][CMA][{cfg.run_name}] optimize total: {_elapsed(optimize_total_t0):.3f}s"
+        )
 
     def error_func(self, parameters, visualize=False, video_path=None):
+        self._timer_eval_id += 1
+        eval_id = self._timer_eval_id
+        eval_type = "visualize" if visualize else "normal"
+        eval_total_t0 = time.perf_counter()
+        logger.info(f"[TIMER][eval {eval_id:04d}][{eval_type}] 开始")
+
+        param_t0 = time.perf_counter()
         global_spring_Y = self.denormalize(
             parameters[0], cfg.spring_Y_min, cfg.spring_Y_max
         )
@@ -302,8 +352,12 @@ class OptimizerCMA:
         collision_dist = self.denormalize(parameters[9], 0.01, 0.05)
         drag_damping = self.denormalize(parameters[10], 0, 20)
         dashpot_damping = self.denormalize(parameters[11], 0, 200)
+        logger.info(
+            f"[TIMER][eval {eval_id:04d}][{eval_type}] 参数反归一化: {_elapsed(param_t0):.3f}s"
+        )
 
         # Initialize the vertices, springs, rest lengths and masses
+        init_graph_t0 = time.perf_counter()
         if self.controller_points is None:
             firt_frame_controller_points = None
         else:
@@ -323,7 +377,13 @@ class OptimizerCMA:
             controller_max_neighbours=controller_max_neighbours,
             mask=self.init_masks,
         )
+        logger.info(
+            f"[TIMER][eval {eval_id:04d}][{eval_type}] 初始化 spring graph: "
+            f"{_elapsed(init_graph_t0):.3f}s, num_springs={len(self.init_springs)}, "
+            f"num_object_springs={self.num_object_springs}"
+        )
 
+        simulator_t0 = time.perf_counter()
         self.simulator = SpringMassSystemWarp(
             self.init_vertices,
             self.init_springs,
@@ -354,7 +414,11 @@ class OptimizerCMA:
             self_collision=cfg.self_collision,
             disable_backward=True,
         )
+        logger.info(
+            f"[TIMER][eval {eval_id:04d}][{eval_type}] 创建 simulator: {_elapsed(simulator_t0):.3f}s"
+        )
 
+        set_init_t0 = time.perf_counter()
         self.simulator.set_init_state(
             self.simulator.wp_init_vertices, self.simulator.wp_init_velocities
         )
@@ -366,6 +430,9 @@ class OptimizerCMA:
 
         if cfg.data_type == "real":
             self.simulator.set_acc_count(False)
+        logger.info(
+            f"[TIMER][eval {eval_id:04d}][{eval_type}] 设置初始状态: {_elapsed(set_init_t0):.3f}s"
+        )
 
         total_loss = 0.0
         if not visualize:
@@ -374,7 +441,11 @@ class OptimizerCMA:
         else:
             max_frame = self.dataset.frame_len
 
+        frame_loop_t0 = time.perf_counter()
+        sim_step_total = 0.0
+        post_total = 0.0
         for j in range(1, max_frame):
+            sim_step_t0 = time.perf_counter()
             self.simulator.set_controller_target(j)
             if self.simulator.object_collision_flag:
                 self.simulator.update_collision_graph()
@@ -390,7 +461,9 @@ class OptimizerCMA:
                     with self.simulator.tape:
                         self.simulator.step()
                         self.simulator.calculate_simple_loss()
+            sim_step_total += _elapsed(sim_step_t0)
 
+            post_t0 = time.perf_counter()
             if visualize == True:
                 x = wp.to_torch(self.simulator.wp_states[-1].wp_x, requires_grad=False)
                 vertices.append(x.cpu())
@@ -411,10 +484,18 @@ class OptimizerCMA:
                 self.simulator.wp_states[-1].wp_x,
                 self.simulator.wp_states[-1].wp_v,
             )
+            post_total += _elapsed(post_t0)
+
+        logger.info(
+            f"[TIMER][eval {eval_id:04d}][{eval_type}] frame loop total: "
+            f"{_elapsed(frame_loop_t0):.3f}s, frames={max_frame - 1}, "
+            f"sim_step+loss={sim_step_total:.3f}s, post={post_total:.3f}s"
+        )
 
         total_loss /= cfg.train_frame - 1
 
         if visualize == True:
+            visualize_t0 = time.perf_counter()
             vertices = torch.stack(vertices, dim=0)
             visualize_pc(
                 vertices[:, : self.num_all_points, :],
@@ -424,5 +505,13 @@ class OptimizerCMA:
                 save_video=True,
                 save_path=video_path,
             )
+            logger.info(
+                f"[TIMER][eval {eval_id:04d}][{eval_type}] 保存 visualize video: "
+                f"{_elapsed(visualize_t0):.3f}s, path={video_path}"
+            )
 
+        logger.info(
+            f"[TIMER][eval {eval_id:04d}][{eval_type}] total: "
+            f"{_elapsed(eval_total_t0):.3f}s, loss={total_loss:.6f}"
+        )
         return total_loss
